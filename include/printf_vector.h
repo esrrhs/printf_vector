@@ -75,7 +75,7 @@ namespace printf_vector {
 
         virtual long long get_int(int &err) override {
             if (index_ >= args_.size()) {
-                err = 1;
+                err = -1;
                 return 0;
             }
             return args_[index_++].ll_;
@@ -83,7 +83,7 @@ namespace printf_vector {
 
         virtual double get_double(int &err) override {
             if (index_ >= args_.size()) {
-                err = 1;
+                err = -1;
                 return 0;
             }
             return args_[index_++].d_;
@@ -91,15 +91,15 @@ namespace printf_vector {
 
         virtual const char *get_string(int &err) override {
             if (index_ >= args_.size()) {
-                err = 1;
-                return 0;
+                err = -1;
+                return "";
             }
             return args_[index_++].s_;
         }
 
         virtual void *get_pointer(int &err) override {
             if (index_ >= args_.size()) {
-                err = 1;
+                err = -1;
                 return 0;
             }
             return args_[index_++].p_;
