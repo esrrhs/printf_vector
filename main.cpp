@@ -2,17 +2,24 @@
 #include "printf_vector.h"
 
 int main(int argc, char *argv[]) {
-    printf_vector::va_list_gadget_impl_t input;
+    printf_vector::vector_input input;
     input.add(1);
-    input.add("2");
-    input.add(3.2f);
-    input.add((void *) 0xDEADBEEF);
-    printf_vector::printfv("Hello, World! %d %s %f %p\n", &input);
+    input.add(2.2f);
+    input.add("333");
+    input.add((void *) 0x4);
+    input.add(2);
+    input.add("55555");
+    input.add(5);
+    input.add(6);
+
+    const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-string=%.*s width-int=%*d\n";
+    printf_vector::printfv(fmt, &input);
 
     input.reset_index();
-    
-    char buffer[100];
-    printf_vector::snprintfv(buffer, 100, "Hello, World! %d %s %f %p\n", &input);
+
+    char buffer[1024];
+    printf_vector::snprintfv(buffer, sizeof(buffer), fmt, &input);
     printf("%s", buffer);
+
     return 0;
 }
