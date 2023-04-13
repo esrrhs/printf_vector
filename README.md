@@ -1,4 +1,8 @@
 # printf_vector
+[<img src="https://img.shields.io/github/license/esrrhs/printf_vector">](https://github.com/esrrhs/printf_vector)
+[<img src="https://img.shields.io/github/languages/top/esrrhs/printf_vector">](https://github.com/esrrhs/printf_vector)
+[<img src="https://img.shields.io/github/actions/workflow/status/esrrhs/printf_vector/cmake.yml?branch=master">](https://github.com/esrrhs/printf_vector/actions)
+
 like libc printf, but can use vector input.
 
 modify from [eyalroz/printf](https://github.com/eyalroz/printf) to support vector
