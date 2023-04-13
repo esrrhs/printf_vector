@@ -359,6 +359,7 @@ namespace printf_vector {
                     break;
 
                 default :
+                    output->write_string(format, 1);
                     format++;
                     break;
             }
