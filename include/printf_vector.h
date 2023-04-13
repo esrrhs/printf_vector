@@ -38,10 +38,10 @@ public:
     input_var(void *p) : p_(p) {}
 
 private:
-    long long ll_;
-    double d_;
-    const char *s_;
-    void *p_;
+    long long ll_ = 0;
+    double d_ = 0;
+    const char *s_ = "";
+    void *p_ = nullptr;
 };
 
 class vector_input : public input_interface {
