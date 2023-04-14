@@ -387,7 +387,8 @@ static inline int format_string_loop(output_interface *output, const char *forma
 }
 
 // internal vsnprintf - used for implementing _all library functions
-static inline int vsnprintf_impl(output_interface *output, const char *format, input_interface *args) {
+static inline int
+vsnprintf_impl(output_interface *output, const char *format, input_interface *args, bool add_terminator = true) {
     format_string_loop(output, format, args);
 
     int len = (int) output->get_length();
@@ -464,7 +465,7 @@ private:
 static inline std::string format(const char *format, input_interface *args) {
     std::string str;
     string_output output(str);
-    vsnprintf_impl(&output, format, args);
+    vsnprintf_impl(&output, format, args, false);
     return str;
 }
 
