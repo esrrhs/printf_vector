@@ -388,13 +388,15 @@ static inline int format_string_loop(output_interface *output, const char *forma
 
 // internal vsnprintf - used for implementing _all library functions
 static inline int
-vsnprintf_impl(output_interface *output, const char *format, input_interface *args, bool add_terminator = true) {
+vsnprintf_impl(output_interface *output, const char *format, input_interface *args, bool add_terminator) {
     format_string_loop(output, format, args);
 
     int len = (int) output->get_length();
 
-    // termination
-    output->write_string("\0", 1);
+    if (add_terminator) {
+        // termination
+        output->write_string("\0", 1);
+    }
 
     // return written chars without terminating \0
     return len;
@@ -415,7 +417,7 @@ private:
 
 static inline int printfv(const char *fmt, input_interface *args) {
     stdout_output output;
-    return vsnprintf_impl(&output, fmt, args);
+    return vsnprintf_impl(&output, fmt, args, false);
 }
 
 class buffer_output : public output_interface {
@@ -445,7 +447,7 @@ private:
 
 static inline int snprintfv(char *s, size_t n, const char *format, input_interface *args) {
     buffer_output output(s, n);
-    return vsnprintf_impl(&output, format, args);
+    return vsnprintf_impl(&output, format, args, true);
 }
 
 class string_output : public output_interface {
