@@ -429,4 +429,25 @@ static inline int snprintfv(char *s, size_t n, const char *format, input_interfa
     return vsnprintf_impl(&output, format, args);
 }
 
+class string_output : public output_interface {
+public:
+    string_output(std::string &str) : _str(str) {}
+
+    virtual void write_string(const char *s, size_t n) override {
+        _str.append(s, n);
+    }
+
+    virtual size_t get_length() override { return _str.length(); }
+
+private:
+    std::string &_str;
+};
+
+static inline std::string format(const char *format, input_interface *args) {
+    std::string str;
+    string_output output(str);
+    vsnprintf_impl(&output, format, args);
+    return str;
+}
+
 }

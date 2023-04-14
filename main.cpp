@@ -21,5 +21,10 @@ int main(int argc, char *argv[]) {
     printf_vector::snprintfv(buffer, sizeof(buffer), fmt, &input);
     printf("%s", buffer);
 
+    input.reset_index();
+
+    auto str = printf_vector::format(fmt, &input);
+    printf("%s", str.c_str());
+
     return 0;
 }
