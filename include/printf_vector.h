@@ -161,7 +161,6 @@ static inline int format_string_loop(output_interface *output, const char *forma
 
     char tmp_format_buffer[strlen(format)];
     const char *tmp_format_start = 0;
-    const char *tmp_format_end = 0;
 
     while (*format) {
         if (*format != '%') {
