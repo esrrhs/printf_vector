@@ -25,11 +25,12 @@ input.add(2);
 input.add("55555");
 input.add(5);
 input.add(6);
+input.add(1.12345);
 
-const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-string=%.*s width-int=%*d\n";
+const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-string=%.*s width-int=%*d short-float=%.2f\n";
 printf_vector::printfv(fmt, &input);
 ```
 and the output is
 ```bash
-Hello, World! int=1 float=2.200000 string=333 pointer=0000000000000004 short-string=55 width-int=    6
+Hello, World! int=1 float=2.200000 string=333 pointer=0000000000000004 short-string=55 width-int=    6 short-float=1.12
 ```

@@ -155,6 +155,21 @@ format_string(output_interface *output, const char *fmt, bool has_width_input, b
     }
 }
 
+// internal test if char is a digit (0-9)
+// @return true if char is a digit
+static inline bool is_digit_(char ch) {
+    return (ch >= '0') && (ch <= '9');
+}
+
+// internal ASCII string to printf_size_t conversion
+static unsigned int atou_(const char **str) {
+    unsigned int i = 0U;
+    while (is_digit_(**str)) {
+        i = i * 10U + (unsigned int) (*((*str)++) - '0');
+    }
+    return i;
+}
+
 static inline int format_string_loop(output_interface *output, const char *format, input_interface *args) {
 
     int err = 0;
@@ -181,7 +196,9 @@ static inline int format_string_loop(output_interface *output, const char *forma
         long long width_input = 0;
 
         // evaluate width field
-        if (*format == '*') {
+        if (is_digit_(*format)) {
+            atou_(&format);
+        } else if (*format == '*') {
             has_width_input = true;
             width_input = args->get_int(err);
             CHECK_ERR_IN_FORMAT_STRING(err);
@@ -194,7 +211,9 @@ static inline int format_string_loop(output_interface *output, const char *forma
         // evaluate precision field
         if (*format == '.') {
             ADVANCE_IN_FORMAT_STRING(format);
-            if (*format == '*') {
+            if (is_digit_(*format)) {
+                atou_(&format);
+            } else if (*format == '*') {
                 has_precision_input = true;
                 precision_input = args->get_int(err);
                 CHECK_ERR_IN_FORMAT_STRING(err);

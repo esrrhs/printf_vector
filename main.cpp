@@ -11,8 +11,9 @@ int main(int argc, char *argv[]) {
     input.add("55555");
     input.add(5);
     input.add(6);
+    input.add(1.12345);
 
-    const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-string=%.*s width-int=%*d\n";
+    const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-string=%.*s width-int=%*d short-float=%.2f\n";
     printf_vector::printfv(fmt, &input);
 
     input.reset_index();
