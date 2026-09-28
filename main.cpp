@@ -1,14 +1,16 @@
-#include <stdio.h>
+#include <cstdio>
+#include <cstring>
+
 #include "printf_vector.h"
 
 int main(int argc, char *argv[]) {
     printf_vector::vector_input input;
     input.add(1);
     input.add(2.2f);
-    input.add("333", strlen("333"));
+    input.add("333", std::strlen("333"));
     input.add((void *) 0x4);
     input.add(2);
-    input.add("55555", strlen("55555"));
+    input.add("55555", std::strlen("55555"));
     input.add(5);
     input.add(6);
     input.add(1.12345);

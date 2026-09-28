@@ -1,8 +1,12 @@
 #pragma once
 
+#include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
-#include "string.h"
+
+// Version is manually set in code and bumped when a release is intended.
+#define PRINTF_VECTOR_VERSION "1.0.0"
 
 namespace printf_vector {
 
@@ -176,7 +180,7 @@ namespace printf_vector {
 
         int err = 0;
 
-        char tmp_format_buffer[strlen(format)];
+        std::vector<char> tmp_format_buffer(std::strlen(format) + 1);
         const char *tmp_format_start = 0;
 
         while (*format) {
@@ -297,19 +301,22 @@ namespace printf_vector {
 
                     if (flags & FLAGS_SIGNED) {
                         // A signed specifier: d, i or possibly I + bit size if enabled
-                        memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start);
-                        tmp_format_buffer[format - tmp_format_start] = '\0';
+                        std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                    static_cast<size_t>(format - tmp_format_start));
+                        tmp_format_buffer[static_cast<size_t>(format - tmp_format_start)] = '\0';
 
-                        format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                      precision_input, args->get_int(err));
+                        format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                      width_input, precision_input, args->get_int(err));
                         CHECK_ERR_IN_FORMAT_STRING(err);
                     } else {
                         // An unsigned specifier: u, x, X, o, b
-                        memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start);
-                        tmp_format_buffer[format - tmp_format_start] = '\0';
+                        std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                    static_cast<size_t>(format - tmp_format_start));
+                        tmp_format_buffer[static_cast<size_t>(format - tmp_format_start)] = '\0';
 
-                        format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                      precision_input, (unsigned long long) args->get_int(err));
+                        format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                      width_input, precision_input,
+                                      (unsigned long long) args->get_int(err));
                         CHECK_ERR_IN_FORMAT_STRING(err);
                     }
                     break;
@@ -320,21 +327,23 @@ namespace printf_vector {
                 case 'E':
                 case 'g':
                 case 'G':
-                    memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start + 1);
-                    tmp_format_buffer[format - tmp_format_start + 1] = '\0';
+                    std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                static_cast<size_t>(format - tmp_format_start + 1));
+                    tmp_format_buffer[static_cast<size_t>(format - tmp_format_start + 1)] = '\0';
 
-                    format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                  precision_input, args->get_double(err));
+                    format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                  width_input, precision_input, args->get_double(err));
                     CHECK_ERR_IN_FORMAT_STRING(err);
 
                     format++;
                     break;
                 case 'c' : {
-                    memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start + 1);
-                    tmp_format_buffer[format - tmp_format_start + 1] = '\0';
+                    std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                static_cast<size_t>(format - tmp_format_start + 1));
+                    tmp_format_buffer[static_cast<size_t>(format - tmp_format_start + 1)] = '\0';
 
-                    format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                  precision_input, args->get_int(err));
+                    format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                  width_input, precision_input, args->get_int(err));
                     CHECK_ERR_IN_FORMAT_STRING(err);
 
                     format++;
@@ -347,11 +356,12 @@ namespace printf_vector {
                     if (p == NULL) {
                         output->write_string("(null)", 6);
                     } else {
-                        memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start + 1);
-                        tmp_format_buffer[format - tmp_format_start + 1] = '\0';
+                        std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                    static_cast<size_t>(format - tmp_format_start + 1));
+                        tmp_format_buffer[static_cast<size_t>(format - tmp_format_start + 1)] = '\0';
 
-                        format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                      precision_input, p);
+                        format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                      width_input, precision_input, p);
                     }
                     format++;
                     break;
@@ -363,11 +373,12 @@ namespace printf_vector {
                     if (value == NULL) {
                         output->write_string("(nil)", 5);
                     } else {
-                        memcpy(tmp_format_buffer, tmp_format_start, format - tmp_format_start + 1);
-                        tmp_format_buffer[format - tmp_format_start + 1] = '\0';
+                        std::memcpy(tmp_format_buffer.data(), tmp_format_start,
+                                    static_cast<size_t>(format - tmp_format_start + 1));
+                        tmp_format_buffer[static_cast<size_t>(format - tmp_format_start + 1)] = '\0';
 
-                        format_string(output, tmp_format_buffer, has_width_input, has_precision_input, width_input,
-                                      precision_input, value);
+                        format_string(output, tmp_format_buffer.data(), has_width_input, has_precision_input,
+                                      width_input, precision_input, value);
                     }
                     format++;
                     break;
@@ -435,7 +446,7 @@ namespace printf_vector {
                 n = _size - _length;
             }
 
-            memcpy(_buffer + _length, s, n);
+            std::memcpy(_buffer + _length, s, n);
             _length += n;
         }
 

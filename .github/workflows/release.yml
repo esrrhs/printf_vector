@@ -1,0 +1,108 @@
+name: Release
+
+# Header-only library: when PRINTF_VECTOR_VERSION changes, publish the header as a GitHub Release.
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - "include/printf_vector.h"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  detect-version:
+    name: Detect version change
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.check.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+
+      - name: Check PRINTF_VECTOR_VERSION
+        id: check
+        run: |
+          set -euo pipefail
+
+          extract_version() {
+            sed -n 's/^#define PRINTF_VECTOR_VERSION "\(.*\)"/\1/p' "$1" | head -n 1
+          }
+
+          VERSION="$(extract_version include/printf_vector.h)"
+          if [ -z "${VERSION}" ]; then
+            echo "Failed to parse PRINTF_VECTOR_VERSION from include/printf_vector.h"
+            exit 1
+          fi
+          echo "Current version: ${VERSION}"
+
+          PREV=""
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            PREV="$(git show HEAD^:include/printf_vector.h 2>/dev/null | sed -n 's/^#define PRINTF_VECTOR_VERSION "\(.*\)"/\1/p' | head -n 1 || true)"
+          fi
+          echo "Previous version: ${PREV:-<none>}"
+
+          CHANGED=false
+          if [ "${VERSION}" != "${PREV}" ]; then
+            CHANGED=true
+          fi
+
+          SHOULD=false
+          if git ls-remote --exit-code --tags origin "refs/tags/v${VERSION}" >/dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists, skip release"
+          elif [ "${CHANGED}" = true ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SHOULD=true
+            echo "Will package and publish v${VERSION}"
+          else
+            echo "Version unchanged (${VERSION}), skip release"
+          fi
+
+          {
+            echo "version=${VERSION}"
+            echo "should_release=${SHOULD}"
+          } >> "${GITHUB_OUTPUT}"
+
+  release:
+    name: Publish GitHub Release
+    needs: detect-version
+    if: needs.detect-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Package header
+        run: |
+          set -euo pipefail
+          VERSION="${{ needs.detect-version.outputs.version }}"
+          PKG="printf_vector-${VERSION}"
+          mkdir -p "${PKG}/include"
+          cp include/printf_vector.h "${PKG}/include/"
+          cp LICENSE README.md README_CN.md "${PKG}/"
+          cmake -E tar czf "${PKG}.tar.gz" "${PKG}"
+          cmake -E tar cf "${PKG}.zip" --format=zip "${PKG}"
+          ls -lh "${PKG}.tar.gz" "${PKG}.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.detect-version.outputs.version }}
+          name: printf_vector v${{ needs.detect-version.outputs.version }}
+          body: |
+            printf_vector ${{ needs.detect-version.outputs.version }}
+
+            Header-only C++ library. Drop `include/printf_vector.h` into your project.
+          files: |
+            printf_vector-*.tar.gz
+            printf_vector-*.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true

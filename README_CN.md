@@ -7,38 +7,38 @@
 
 [English](README.md) | [中文说明](README_CN.md)
 
-Header-only C++ `printf`-style formatting with vector (or custom) input arguments.
+类似 libc `printf` 的 C++ 格式化库，但支持用 vector（或自定义输入）传参。纯头文件，开箱即用。
 
-Modified from [eyalroz/printf](https://github.com/eyalroz/printf) to support vector-style argument packs.
+基于 [eyalroz/printf](https://github.com/eyalroz/printf) 改造，增加 vector 风格参数包支持。
 
-## Features
+## 特性
 
-* C++ header-only (`include/printf_vector.h`)
-* Uses `std::snprintf` under the hood
-* Dedicated `printf_vector` namespace
-* Vector / custom input via `input_interface`
-* APIs: `printfv`, `snprintfv`, `format`
+* C++ 纯头文件（`include/printf_vector.h`）
+* 底层使用 `std::snprintf`
+* 独立 `printf_vector` 命名空间
+* 通过 `input_interface` 支持 vector / 自定义输入
+* 提供 `printfv`、`snprintfv`、`format`
 
-## Requirements
+## 环境要求
 
-* C++11 or later
-* CMake 3.12+ (for the example / CI build)
+* C++11 及以上
+* CMake 3.12+（用于示例与 CI 构建）
 
-## Build example
+## 构建示例
 
 ```bash
 ./build.sh
-# or
+# 或者
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-## Usage
+## 使用方法
 
-Drop `include/printf_vector.h` into your project, or link the CMake `INTERFACE` target `printf_vector`.
+将 `include/printf_vector.h` 拷入工程，或通过 CMake `INTERFACE` 目标 `printf_vector` 引用。
 
-Example (see [main.cpp](./main.cpp)):
+示例见 [main.cpp](./main.cpp)：
 
 ```cpp
 printf_vector::vector_input input;
@@ -56,13 +56,13 @@ const char *fmt = "Hello, World! int=%d float=%f string=%s pointer=%p short-stri
 printf_vector::printfv(fmt, &input);
 ```
 
-Typical output:
+典型输出：
 
 ```text
 Hello, World! int=1 float=2.200000 string=333 pointer=0x4 short-string=55 width-int=    6 short-float=1.12
 ```
 
-Also available:
+也支持：
 
 ```cpp
 char buffer[1024];
@@ -71,10 +71,10 @@ printf_vector::snprintfv(buffer, sizeof(buffer), fmt, &input);
 auto str = printf_vector::format(fmt, &input);
 ```
 
-## Release
+## 发布说明
 
-GitHub Release watches `PRINTF_VECTOR_VERSION` in `include/printf_vector.h`. Bump that string on `master` to publish a tagged release with the header package.
+GitHub Release 会监视 `include/printf_vector.h` 中的 `PRINTF_VECTOR_VERSION`。在 `master` 上修改该版本号即可自动打 tag 并发布头文件包。
 
-## License
+## 许可证
 
 [MIT](LICENSE)
